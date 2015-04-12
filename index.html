@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf8" />
+    <title>Air (Desktop)</title>
+    <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no" />
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet" />
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap-theme.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="easeljs-0.8.0.min.js"></script>
+    <script src="stage.js"></script>
+    <script src="game.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="created">Demo</div>
+      <div id="stage">
+        <div id="welcome" class="stage">
+          <div class="box">
+            <h1>Air</h1>
+            <p class="description">
+              <p>A game about pollution and our life.</p>
+            </p>
+            <div class="controls">
+              <button id="start-btn" class="btn btn-primary">Start</button>
+            </div>
+          </div>
+        </div>
+        <canvas id="game" class="stage" width="800" height="600"></canvas>
+      </div>
+    </div>
+  </body>
+</html>
