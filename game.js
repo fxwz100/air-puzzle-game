@@ -3,86 +3,147 @@
 (function () {
   "use strict";
 
-  function Tile(x, y, width, height, selectable) {
-    this.Container_constructor();
+  // Tile Class
+  var Tile = (function () {
+    function Tile(x, y, width, height, selectable) {
+      this.Container_constructor();
 
-    this.x = this.originX = x;
-    this.y = this.originY = y;
-    this.width = width;
-    this.height = height;
-    this.color = Math.random() > 0.5 ? "#ccc" : "#0cf";
+      this.x = this.originX = x;
+      this.y = this.originY = y;
+      this.width = width;
+      this.height = height;
+      this.color = Math.random() > 0.5 ? "#ccc" : "#0cf";
 
-    this.mouseEnabled = selectable;
-    this.setup();
-  }
-
-  var TileClass = createjs.extend(Tile, createjs.Container);
-
-  TileClass.setup = function () {
-    var background = new createjs.Shape();
-    background.graphics.beginFill(this.color).drawRoundRect(0, 0, this.width, this.height, 10);
-    this.addChild(background);
-
-    var label = new createjs.Text(this.id, "bold 14px Arial", "#FFFFFF");
-    label.textAlign = "center";
-    label.x = this.width / 2;
-    label.y = this.height / 2;
-    this.addChild(label);
-
-    var spriteSheet = new createjs.SpriteSheet({
-      images: ["sprites.jpg"],
-      frames: {width:50, height:50},
-      animations: {
-        play: [0, 1, 2, 3, 4, 5, 6]
-      }
-    });
-    var sprite = this.sprite = new createjs.Sprite(spriteSheet);
-    this.addChild(sprite);
-
-    if (this.mouseEnabled) {
-      this.on("rollover", function () {
-        this.alpha = 0.4;
-      });
-      this.on("rollout", function () {
-        this.alpha = 1;
-      });
-      this.on("pressmove", function (evt) {
-        this.stage.setChildIndex(this, 0);
-        evt.currentTarget.x = evt.stageX - this.width / 2;
-        evt.currentTarget.y = evt.stageY - this.height / 2;
-      });
-      this.on("pressup", function (evt) {
-        var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
-        if (obj) {
-          this.x = obj.originX;
-          this.y = obj.originY;
-          obj.x = obj.originX = this.originX;
-          obj.y = obj.originY = this.originY;
-          this.originX = this.x;
-          this.originY = this.y;
-        } else {
-          this.x = this.originX;
-          this.y = this.originY;
-        }
-      });
+      this.mouseEnabled = selectable;
+      this.setup();
     }
 
-    this.mouseChildren = false;
-  };
+    var TileClass = createjs.extend(Tile, createjs.Container);
 
-  TileClass.play = function (callback) {
-    this.sprite.gotoAndPlay('play');
-    this.sprite.on('animationend', callback);
-  };
+    TileClass.setup = function () {
+      var background = new createjs.Shape();
+      background.graphics.beginFill(this.color).drawRoundRect(0, 0, this.width, this.height, 10);
+      this.addChild(background);
 
-  window.Tile = createjs.promote(Tile, "Container");
+      var label = new createjs.Text(this.id, "bold 14px Arial", "#FFFFFF");
+      label.textAlign = "center";
+      label.x = this.width / 2;
+      label.y = this.height / 2;
+      this.addChild(label);
+
+      var spriteSheet = new createjs.SpriteSheet({
+        images: ["spritesheet_grant.png"],
+        frames: {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
+        animations: {
+          still: 0,
+          play: [0, 8, 'still']
+        },
+        // framerate: 5
+      });
+      var sprite = this.sprite = new createjs.Sprite(spriteSheet);
+      sprite.x = this.width / 2;
+      sprite.y = 0;
+      sprite.visible = false;
+      sprite.scaleX = 0.5;
+      sprite.scaleY = 0.5;
+      // sprite.gotoAndPlay(0);
+      this.addChild(sprite);
+
+      if (this.mouseEnabled) {
+        this.on("rollover", function () {
+          this.alpha = 0.4;
+        });
+        this.on("rollout", function () {
+          this.alpha = 1;
+        });
+        this.on("pressmove", function (evt) {
+          this.stage.setChildIndex(this, 0);
+          evt.currentTarget.x = evt.stageX - this.width / 2;
+          evt.currentTarget.y = evt.stageY - this.height / 2;
+        });
+        this.on("pressup", function (evt) {
+          var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
+          if (obj) {
+            this.x = obj.originX;
+            this.y = obj.originY;
+            obj.x = obj.originX = this.originX;
+            obj.y = obj.originY = this.originY;
+            this.originX = this.x;
+            this.originY = this.y;
+          } else {
+            this.x = this.originX;
+            this.y = this.originY;
+          }
+        });
+      }
+
+      this.mouseChildren = false;
+    };
+
+    TileClass.play = function (callback) {
+      this.sprite.visible = true;
+      this.sprite.gotoAndPlay('play');
+      this.sprite.on('animationend', function () {
+        callback();
+      }, this.sprite, true);
+      console.log(this.id);
+    };
+    
+    return createjs.promote(Tile, "Container");
+  }());
+  
+  var StartTile = (function () {
+    function StartTile(x, y, width, height) {
+      this.Container_constructor();
+      
+      this.x = this.originX = x;
+      this.y = this.originY = y;
+      this.width = width;
+      this.height = height;
+      
+      this.setup();
+    }
+    
+    var StartTileClass = createjs.extend(StartTile, createjs.Container);
+    
+    StartTileClass.setup = function () {
+      var background = new createjs.Shape();
+      background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
+      this.addChild(background);
+      
+      var circle = this.btn = new createjs.Shape();
+      circle.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
+      circle.graphics.beginFill('#df1').drawPolyStar(this.width / 2, this.height / 2, this.height / 6, 3, 0, 0).endFill();
+      
+      circle.on('rollover', function () {
+        this.alpha = 0.4;
+      });
+      circle.on('rollout', function () {
+        this.alpha = 1;
+      });
+      
+      var self = this;
+      circle.on('click', function () {
+        self.dispatchEvent('start');
+      });
+      
+      this.addChild(circle);
+    };
+    
+    StartTileClass.play = function (callback) {
+      console.log(this.id);
+      setTimeout(callback, 10);
+    };
+    
+    return createjs.promote(StartTile, "Container");
+  }());
 
   window.addEventListener('load', function() {
     var stage = new createjs.Stage("game");
     stage.enableMouseOver(20);
 
     var tiles = [
-      stage.addChild(new Tile(0, 0, 530, 196)),
+      stage.addChild(new StartTile(0, 0, 530, 196)),
       stage.addChild(new Tile(535, 0, 265, 196, true)),
 
       stage.addChild(new Tile(0, 201, 263, 196, true)),
@@ -93,13 +154,22 @@
       stage.addChild(new Tile(270, 402, 530, 196))
     ];
 
-    tiles[0].on('click', function () {
+    tiles[0].on('start', function () {
       var index = 0;
       function play() {
-        if (index < tiles.length) {
+        if (++index < tiles.length) {
           tiles[index].play(play);
         }
       }
+      tiles.sort(function (a, b) {
+        if (a.y < b.y) {
+          return -1;
+        }  else if (a.y == b.y) {
+          return a.x - b.x;
+        } else {
+          return 1;
+        }
+      });
       tiles[index].play(play);
     });
 
