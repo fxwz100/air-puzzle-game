@@ -86,6 +86,7 @@
         this.sprite.gotoAndPlay('jump');
       }
       this.sprite.on('animationend', function () {
+        this.sprite.visible = false;
         callback(this);
       }, this, true);
       console.log(this.id);
@@ -172,7 +173,7 @@
       
       var self = this;
       circle.on('click', function () {
-        self.dispatchEvent('start');
+        self.dispatchEvent('end');
       });
 
       circle.visible = false;
@@ -187,7 +188,7 @@
     return createjs.promote(EndTile, "Container");
   }());
 
-  window.addEventListener('load', function() {
+  window.initGame = function (callback) {
     var stage = new createjs.Stage("game");
     stage.enableMouseOver(20);
 
@@ -222,7 +223,9 @@
       tiles[index].play(null, play);
     });
 
+    tiles[6].on('end', callback);
+
     createjs.Ticker.on("tick", stage);
-  });
+  };
 
 }());

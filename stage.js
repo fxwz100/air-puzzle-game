@@ -8,6 +8,9 @@
 
     startBtn.addEventListener("click", function () {
       stage.className = "state-1";
+      initGame(function () {
+      	stage.className = 'state-2';
+      });
     });
   });
 

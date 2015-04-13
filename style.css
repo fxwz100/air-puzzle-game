@@ -43,8 +43,8 @@ body {
 }
 
 #stage.state-2 {
-  transform: translate(0, -1200px);
-  -webkit-transform: translate(0, -600px);
+  transform: translate(0, -1210px);
+  -webkit-transform: translate(0, -1210px);
 }
 
 .stage {
