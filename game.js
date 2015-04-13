@@ -14,7 +14,6 @@
       this.height = height;
       this.color = Math.random() > 0.5 ? "#ccc" : "#0cf";
 
-      this.mouseEnabled = selectable;
       this.setup();
     }
 
@@ -36,7 +35,8 @@
         frames: {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
         animations: {
           still: 0,
-          play: [0, 8, 'still']
+          play: [0, 12, 'still'],
+          jump: [48, 56, 'still']
         },
         // framerate: 5
       });
@@ -49,43 +49,45 @@
       // sprite.gotoAndPlay(0);
       this.addChild(sprite);
 
-      if (this.mouseEnabled) {
-        this.on("rollover", function () {
-          this.alpha = 0.4;
-        });
-        this.on("rollout", function () {
-          this.alpha = 1;
-        });
-        this.on("pressmove", function (evt) {
-          this.stage.setChildIndex(this, 0);
-          evt.currentTarget.x = evt.stageX - this.width / 2;
-          evt.currentTarget.y = evt.stageY - this.height / 2;
-        });
-        this.on("pressup", function (evt) {
-          var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
-          if (obj) {
-            this.x = obj.originX;
-            this.y = obj.originY;
-            obj.x = obj.originX = this.originX;
-            obj.y = obj.originY = this.originY;
-            this.originX = this.x;
-            this.originY = this.y;
-          } else {
-            this.x = this.originX;
-            this.y = this.originY;
-          }
-        });
-      }
+      this.on("rollover", function () {
+        this.alpha = 0.4;
+      });
+      this.on("rollout", function () {
+        this.alpha = 1;
+      });
+      this.on("pressmove", function (evt) {
+        this.stage.setChildIndex(this, 0);
+        evt.currentTarget.x = evt.stageX - this.width / 2;
+        evt.currentTarget.y = evt.stageY - this.height / 2;
+      });
+      this.on("pressup", function (evt) {
+        var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
+        if (obj) {
+          this.x = obj.originX;
+          this.y = obj.originY;
+          obj.x = obj.originX = this.originX;
+          obj.y = obj.originY = this.originY;
+          this.originX = this.x;
+          this.originY = this.y;
+        } else {
+          this.x = this.originX;
+          this.y = this.originY;
+        }
+      });
 
       this.mouseChildren = false;
     };
 
-    TileClass.play = function (callback) {
+    TileClass.play = function (tile, callback) {
       this.sprite.visible = true;
-      this.sprite.gotoAndPlay('play');
+      if (tile && tile.id == 8 && this.id == 16) {
+        this.sprite.gotoAndPlay('play');
+      } else {
+        this.sprite.gotoAndPlay('jump');
+      }
       this.sprite.on('animationend', function () {
-        callback();
-      }, this.sprite, true);
+        callback(this);
+      }, this, true);
       console.log(this.id);
     };
     
@@ -130,12 +132,59 @@
       this.addChild(circle);
     };
     
-    StartTileClass.play = function (callback) {
-      console.log(this.id);
+    StartTileClass.play = function (tile, callback) {
+      this.btn.visible = false;
       setTimeout(callback, 10);
     };
     
     return createjs.promote(StartTile, "Container");
+  }());
+
+  var EndTile = (function () {
+    function EndTile(x, y, width, height) {
+      this.Container_constructor();
+      
+      this.x = this.originX = x;
+      this.y = this.originY = y;
+      this.width = width;
+      this.height = height;
+      
+      this.setup();
+    }
+    
+    var EndTileClass = createjs.extend(EndTile, createjs.Container);
+    
+    EndTileClass.setup = function () {
+      var background = new createjs.Shape();
+      background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
+      this.addChild(background);
+      
+      var circle = this.btn = new createjs.Shape();
+      circle.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
+      circle.graphics.beginFill('#df1').drawPolyStar(this.width / 2, this.height / 2, this.height / 6, 3, 0, 0).endFill();
+      
+      circle.on('rollover', function () {
+        this.alpha = 0.4;
+      });
+      circle.on('rollout', function () {
+        this.alpha = 1;
+      });
+      
+      var self = this;
+      circle.on('click', function () {
+        self.dispatchEvent('start');
+      });
+
+      circle.visible = false;
+      
+      this.addChild(circle);
+    };
+    
+    EndTileClass.play = function (tile, callback) {
+      this.btn.visible = true;
+    };
+    
+    return createjs.promote(EndTile, "Container");
   }());
 
   window.addEventListener('load', function() {
@@ -151,14 +200,14 @@
       stage.addChild(new Tile(536, 201, 263, 196, true)),
 
       stage.addChild(new Tile(0, 402, 265, 196, true)),
-      stage.addChild(new Tile(270, 402, 530, 196))
+      stage.addChild(new EndTile(270, 402, 530, 196))
     ];
 
     tiles[0].on('start', function () {
       var index = 0;
-      function play() {
+      function play(tile) {
         if (++index < tiles.length) {
-          tiles[index].play(play);
+          tiles[index].play(tile, play);
         }
       }
       tiles.sort(function (a, b) {
@@ -170,7 +219,7 @@
           return 1;
         }
       });
-      tiles[index].play(play);
+      tiles[index].play(null, play);
     });
 
     createjs.Ticker.on("tick", stage);
