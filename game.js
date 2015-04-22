@@ -3,9 +3,45 @@
 (function () {
   "use strict";
 
+  var spriteSheet = (function () {
+
+    var res = {
+      cloud: [1, 72],
+      grass: [1, 65],
+      rabbit: [1, 50],
+      sheep: [1, 66],
+      tree: [1, 66]
+    };
+
+    var images = Object.keys(res).map(function (name) {
+      var r = res[name], l = [];
+      for (var i=r[0]; i<=r[1]; i++) {
+        l.push('res/' + name + '/' + i + '.jpg');
+      }
+      return l;
+    }).reduce(function (c, it) {
+      return c.concat(it);
+    });
+
+    var animations = Object.keys(res).reduce(function (result, name) {
+      result.anim[name + '_start'] = result.count;
+      result.anim[name + '_play'] = [result.count, result.count + res[name][1] - 1, name + '_end'];
+      result.anim[name + '_end'] = result.count + res[name][1] - 1;
+      result.count += res[name][1];
+      return result;
+    }, {count: 0, anim: {}}).anim;
+
+    return new createjs.SpriteSheet({
+      images: images,
+      frames: {"regX": 0, "regY": 0, "count": images.length, "height": 190, "width": 190},
+      animations: animations,
+      // framerate: 5
+    });
+  }());
+
   // Tile Class
   var Tile = (function () {
-    function Tile(x, y, width, height, selectable) {
+    function Tile(x, y, width, height, name) {
       this.Container_constructor();
 
       this.x = this.originX = x;
@@ -13,6 +49,8 @@
       this.width = width;
       this.height = height;
       this.color = Math.random() > 0.5 ? "#ccc" : "#0cf";
+
+      this.name = name;
 
       this.setup();
     }
@@ -30,23 +68,10 @@
       label.y = this.height / 2;
       this.addChild(label);
 
-      var spriteSheet = new createjs.SpriteSheet({
-        images: ["spritesheet_grant.png"],
-        frames: {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
-        animations: {
-          still: 0,
-          play: [0, 12, 'still'],
-          jump: [48, 56, 'still']
-        },
-        // framerate: 5
-      });
       var sprite = this.sprite = new createjs.Sprite(spriteSheet);
-      sprite.x = this.width / 2;
+      sprite.x = 0;
       sprite.y = 0;
-      sprite.visible = false;
-      sprite.scaleX = 0.5;
-      sprite.scaleY = 0.5;
-      // sprite.gotoAndPlay(0);
+      sprite.gotoAndStop(this.name + '_start');
       this.addChild(sprite);
 
       this.on("rollover", function () {
@@ -78,15 +103,20 @@
       this.mouseChildren = false;
     };
 
+    var state = {
+      grass: {
+        grass: 'jump'
+      }
+    };
+
     TileClass.play = function (tile, callback) {
       this.sprite.visible = true;
-      if (tile && tile.id == 8 && this.id == 16) {
-        this.sprite.gotoAndPlay('play');
+      if (tile && state[tile.name] && state[tile.name][this.name]) {
+        this.sprite.gotoAndPlay(state[tile.name][this.name]);
       } else {
-        this.sprite.gotoAndPlay('jump');
+        this.sprite.gotoAndPlay(this.name + '_play');
       }
       this.sprite.on('animationend', function () {
-        this.sprite.visible = false;
         callback(this);
       }, this, true);
       console.log(this.id);
@@ -104,6 +134,8 @@
       this.width = width;
       this.height = height;
       
+      this.name = 'cloud';
+
       this.setup();
     }
     
@@ -114,6 +146,15 @@
       background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
       this.addChild(background);
       
+      var sprite = this.sprite = new createjs.Sprite(spriteSheet);
+      sprite.x = this.width / 2;
+      sprite.y = 0;
+//      sprite.visible = false;
+//      sprite.scaleX = 0.2;
+//      sprite.scaleY = 0.2;
+       sprite.gotoAndStop(this.name + '_start');
+      this.addChild(sprite);
+
       var circle = this.btn = new createjs.Shape();
       circle.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
       circle.graphics.beginFill('#df1').drawPolyStar(this.width / 2, this.height / 2, this.height / 6, 3, 0, 0).endFill();
@@ -135,7 +176,11 @@
     
     StartTileClass.play = function (tile, callback) {
       this.btn.visible = false;
-      setTimeout(callback, 10);
+      this.sprite.visible = true;
+      this.sprite.gotoAndPlay(this.name + '_play');
+      this.sprite.on('animationend', function () {
+        callback(this);
+      }, this, true);
     };
     
     return createjs.promote(StartTile, "Container");
@@ -150,6 +195,8 @@
       this.width = width;
       this.height = height;
       
+      this.name = 'grass';
+
       this.setup();
     }
     
@@ -192,25 +239,23 @@
     var stage = new createjs.Stage("game");
     stage.enableMouseOver(20);
 
+    var startTile = stage.addChild(new StartTile(5, 5, 590, 190));
     var tiles = [
-      stage.addChild(new StartTile(0, 0, 530, 196)),
-      stage.addChild(new Tile(535, 0, 265, 196, true)),
+      stage.addChild(new Tile(605, 5, 190, 190, 'cloud')),
 
-      stage.addChild(new Tile(0, 201, 263, 196, true)),
-      stage.addChild(new Tile(268, 201, 262, 196, true)),
-      stage.addChild(new Tile(536, 201, 263, 196, true)),
+      stage.addChild(new Tile(5, 205, 190, 190, 'sheep')),
+      stage.addChild(new Tile(205, 205, 190, 190, 'grass')),
+      stage.addChild(new Tile(405, 205, 190, 190, 'grass')),
+      stage.addChild(new Tile(605, 205, 190, 190, 'tree')),
 
-      stage.addChild(new Tile(0, 402, 265, 196, true)),
-      stage.addChild(new EndTile(270, 402, 530, 196))
+      stage.addChild(new Tile(5, 405, 190, 190, 'rabbit'))
     ];
+    var endTile = stage.addChild(new EndTile(205, 405, 590, 190));
 
-    tiles[0].on('start', function () {
-      var index = 0;
-      function play(tile) {
-        if (++index < tiles.length) {
-          tiles[index].play(tile, play);
-        }
-      }
+    startTile.on('start', function () {
+      tiles.forEach(function (tile) {
+        tile.mouseEnabled = false;
+      });
       tiles.sort(function (a, b) {
         if (a.y < b.y) {
           return -1;
@@ -220,10 +265,18 @@
           return 1;
         }
       });
-      tiles[index].play(null, play);
+      var index = -1;
+      function play(tile) {
+        if (++index < tiles.length) {
+          tiles[index].play(tile, play);
+        } else if (index == tiles.length) {
+          endTile.play(tile, play);
+        }
+      }
+      startTile.play(null, play);
     });
 
-    tiles[6].on('end', callback);
+    endTile.on('end', callback);
 
     createjs.Ticker.on("tick", stage);
   };

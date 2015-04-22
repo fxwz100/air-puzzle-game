@@ -76,19 +76,35 @@ body {
   height: 100%;
 }
 
-#welcome .box {
+.controls {
   position: absolute;
-  top: 50%;
-  -webkit-transform: translate(0, -50%);
+  left: 0;
+  bottom: 0;
   width: 100%;
-  text-align: center;
+  height: 20%;
+  line-height: 10%;
 }
 
-#welcome .description {
-  color: #ccc;
+.controls .btn.hidden {
+  opacity: 0;
 }
 
-#welcome .controls {
-  margin-top: 2em;
+.controls .btn {
+  display: block;
+  margin: auto;
+  padding: 0.8em 1em;
+  font-size: 1.2em;
+  border-radius: 2em;
+  background: -webkit-linear-gradient(top, #fff, #efefef);
+  border: 1px solid transparent;
+  transition-duration: 1s;
+  opacity: 0.8;
 }
 
+.controls .btn:hover {
+  opacity: 1;
+}
+
+.controls .btn:active {
+  background-color: #fff;
+}
