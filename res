@@ -1,1 +1,0 @@
-../../IdeaProjects/air-game/res/
