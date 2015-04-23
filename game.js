@@ -6,11 +6,14 @@
   var spriteSheet = (function () {
 
     var res = {
+      animal: [1, 61],
       cloud: [1, 72],
       grass: [1, 65],
-      rabbit: [1, 50],
-      sheep: [1, 66],
-      tree: [1, 66]
+      grass_animal: [1, 65],
+      tree: [1, 66],
+      tree_animal: [1, 66],
+      water_animal: [1, 50],
+      mountain: [1, 128]
     };
 
     var images = Object.keys(res).map(function (name) {
@@ -62,7 +65,7 @@
       background.graphics.beginFill(this.color).drawRoundRect(0, 0, this.width, this.height, 10);
       this.addChild(background);
 
-      var label = new createjs.Text(this.id, "bold 14px Arial", "#FFFFFF");
+      var label = new createjs.Text(this.name, "bold 14px Arial", "#FFFFFF");
       label.textAlign = "center";
       label.x = this.width / 2;
       label.y = this.height / 2;
@@ -104,8 +107,14 @@
     };
 
     var state = {
+      water: {
+        animal: 'water_animal_play'
+      },
+      tree: {
+        animal: 'tree_animal_play'
+      },
       grass: {
-        grass: 'jump'
+        animal: 'grass_animal_play'
       }
     };
 
@@ -146,14 +155,14 @@
       background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
       this.addChild(background);
       
-      var sprite = this.sprite = new createjs.Sprite(spriteSheet);
-      sprite.x = this.width / 2;
-      sprite.y = 0;
-//      sprite.visible = false;
-//      sprite.scaleX = 0.2;
-//      sprite.scaleY = 0.2;
-       sprite.gotoAndStop(this.name + '_start');
-      this.addChild(sprite);
+//      var sprite = this.sprite = new createjs.Sprite(spriteSheet);
+//      sprite.x = this.width / 2;
+//      sprite.y = 0;
+////      sprite.visible = false;
+////      sprite.scaleX = 0.2;
+////      sprite.scaleY = 0.2;
+//       sprite.gotoAndStop(this.name + '_start');
+//      this.addChild(sprite);
 
       var circle = this.btn = new createjs.Shape();
       circle.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
@@ -176,11 +185,12 @@
     
     StartTileClass.play = function (tile, callback) {
       this.btn.visible = false;
-      this.sprite.visible = true;
-      this.sprite.gotoAndPlay(this.name + '_play');
-      this.sprite.on('animationend', function () {
-        callback(this);
-      }, this, true);
+//      this.sprite.visible = true;
+//      this.sprite.gotoAndPlay(this.name + '_play');
+//      this.sprite.on('animationend', function () {
+//        callback(this);
+//      }, this, true);
+      callback(this);
     };
     
     return createjs.promote(StartTile, "Container");
@@ -243,12 +253,12 @@
     var tiles = [
       stage.addChild(new Tile(605, 5, 190, 190, 'cloud')),
 
-      stage.addChild(new Tile(5, 205, 190, 190, 'sheep')),
+      stage.addChild(new Tile(5, 205, 190, 190, 'mountain')),
       stage.addChild(new Tile(205, 205, 190, 190, 'grass')),
       stage.addChild(new Tile(405, 205, 190, 190, 'grass')),
       stage.addChild(new Tile(605, 205, 190, 190, 'tree')),
 
-      stage.addChild(new Tile(5, 405, 190, 190, 'rabbit'))
+      stage.addChild(new Tile(5, 405, 190, 190, 'animal'))
     ];
     var endTile = stage.addChild(new EndTile(205, 405, 590, 190));
 
