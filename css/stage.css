@@ -1,0 +1,48 @@
+/* coding: utf8 */
+/* use with stage manager */
+
+#stage {
+  transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.stage {
+  width: 800px;
+  height: 600px;
+  margin-bottom: 5px;
+  opacity: 0;
+  transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/*
+#stage.state-1 {
+  transform: translate(0, -605px);
+  -webkit-transform: translate(0, -605px);
+}
+
+#stage.state-2 {
+  transform: translate(0, -1210px);
+  -webkit-transform: translate(0, -1210px);
+}*/
+
+#stage[data-state="0"] .welcome.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="1"] .puzzle.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="2"] .end.stage {
+  z-index: 100;
+  opacity: 1;
+}

@@ -4,21 +4,19 @@
     <meta charset="utf8" />
     <title>Air (Desktop)</title>
     <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no" />
-    <link href="http://cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet" />
-<!--
-    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet" />
-    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap-theme.css" rel="stylesheet" />
--->
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <script src="easeljs-0.8.0.min.js"></script>
-    <script src="stage.js"></script>
-    <script src="game.js"></script>
+    <link rel="stylesheet" href="vender/font-awesome-4.3.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/stage.css" />
+    <script src="vender/createjs/easeljs-0.8.0.min.js"></script>
+    <script src="js/stage-manager.js"></script>
+    <script src="js/puzzle.js"></script>
+    <script src="js/main.js"></script>
   </head>
   <body>
     <div class="container">
-      <div id="created">Demo</div>
+      <div id="created" class="brand">Demo</div>
       <div id="stage">
-        <div id="welcome" class="stage">
+        <div id="welcome" class="welcome stage">
           <video id="preview" autoplay="true">
             <source src="res/gas.mp4" type="video/mp4" />
           </video>
@@ -26,9 +24,9 @@
             <button id="start-btn" class="btn hidden"><i class="fa fa-play"></i></button>
           </div>
         </div>
-        <canvas id="game" class="stage" width="800" height="600"></canvas>
-        <div id="end" class="stage">
-          <h1>Thanks for playing this game.
+        <canvas id="puzzle" class="puzzle stage" width="800" height="600"></canvas>
+        <div id="end" class="end stage">
+          <h1>Thanks for playing this game.</h1>
         </div>
       </div>
     </div>
