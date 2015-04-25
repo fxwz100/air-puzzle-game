@@ -36,7 +36,7 @@
       if (this.stageListeners[i]) {
         var manager = this;
         this.stageListeners[i].forEach(function (listener) {
-          listener(this.stages[i], manager);
+          listener(manager.stages[i], manager);
         });
       }
     };

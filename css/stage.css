@@ -26,12 +26,39 @@
   opacity: 1;
 }
 
-#stage[data-state="1"] .puzzle.stage {
+#stage[data-state="1"] .puzzle-1.stage {
   z-index: 100;
   opacity: 1;
+}
+
+#stage[data-state="1"] .tips {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  opacity: 1;
+}
+
+#stage[data-state="1"] .tips.hidden {
+  opacity: 0;
+}
+
+.puzzle-1.stage .tips {
+  position: absolute;
+  top: 210px;
+  left: 200px;
+  width: 15em;
+  border-radius: 10px;
+  background-color: yellow;
+  box-shadow: 0 0 20px #999;
+  padding: 0.5em;
+  transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  opacity: 0;
 }
 
 #stage[data-state="2"] .end.stage {
   z-index: 100;
   opacity: 1;
 }
+

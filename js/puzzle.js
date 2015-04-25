@@ -341,6 +341,7 @@
 
     PuzzleGame.prototype.setupTiles = function (tiles) {
       var game = this;
+      this.tiles = [];
       tiles.forEach(function (def) {
         game.addTile(def[0], def[1], def[2], def[3], def[4], def[5]);
       });
@@ -359,6 +360,7 @@
     };
 
     function setup(puzzle, initDef) {
+      puzzle.stage.removeAllChildren();
       if (initDef.start) {
         puzzle.addStartTile.apply(puzzle, initDef.start);
       }

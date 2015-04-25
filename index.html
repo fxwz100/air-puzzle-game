@@ -5,6 +5,7 @@
     <title>Air (Desktop)</title>
     <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no" />
     <link rel="stylesheet" href="vender/font-awesome-4.3.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="vender/animate.css/animate.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/stage.css" />
     <script src="vender/createjs/easeljs-0.8.0.min.js"></script>
@@ -26,7 +27,12 @@
             <button id="start-btn" class="btn hidden"><i class="fa fa-play"></i></button>
           </div>
         </div>
-        <canvas id="puzzle" class="puzzle stage" width="800" height="600"></canvas>
+        <div id="puzzle-1" class="puzzle-1 stage">
+          <div class="tips bounceIn">
+            <i class="fa fa-hand-o-left fa-2x animated swing infinite"></i>这是一个拼图游戏，你可以试试拖动不同的拼图，不同的拼图组合会生成不同的动画，让玩家了解这个拼图游戏的乐趣。
+          </div>
+          <canvas id="puzzle-1-canvas" width="800" height="600"></canvas>
+        </div>
         <div id="start" class="transition stage">
           <video id="start-video">
             <source src="res/start.mp4" type="video/mp4" />

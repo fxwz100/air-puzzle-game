@@ -26,6 +26,14 @@
 
     // the puzzle game.
     stageManager.setup(1, function (stage, manager) {
+      var tips = document.querySelector('.puzzle-1.stage .tips');
+      setTimeout(function () {
+        tips.style.display = 'none';
+      }, 10000);
+      tips.addEventListener('click', function () {
+        tips.style.display = 'none';
+      });
+
       var res = (function () {
         var res = {
           animal:       [1, 61],
@@ -76,7 +84,7 @@
           animal: 'grass_animal_play'
         }
       };
-      var game = new PuzzleGame(stage, res, state);
+      var game = new PuzzleGame('puzzle-1-canvas', res, state);
       game.init({
         start: [5, 5, 590, 190],
         tiles: [
@@ -126,7 +134,7 @@
     }, true);
 
     window.addEventListener('popstate', function (event) {
-      if(event.state && event.state.stage) {
+      if (event.state && event.state.stage) {
         stageManager.gotoStage(event.state.stageId);
       }
     });
