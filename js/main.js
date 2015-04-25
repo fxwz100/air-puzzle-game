@@ -6,27 +6,33 @@
   window.addEventListener('load', function () {
     var stageManager = new StageManager('stage');
 
+    // the first animation.
     stageManager.setup(0, function (stage, manager) {
       var startBtn = document.getElementById("start-btn");
-      var preview = document.getElementById("preview");
+      var preview = document.getElementById("welcome-video");
 
       preview.addEventListener('ended', function () {
         startBtn.classList.remove('hidden');
       });
 
       startBtn.addEventListener('click', function () {
+        window.history.pushState({
+          stageId: manager.stageId,
+          stage: true
+        }, "stage#" + manager.stageId, null);
         manager.nextStage();
       });
     });
 
+    // the puzzle game.
     stageManager.setup(1, function (stage, manager) {
       var res = (function () {
         var res = {
           animal:       [1, 61],
           cloud:        [1, 72],
-          grass:        [1, 65],
+          grass:        [1, 150],
           grass_animal: [1, 65],
-          tree:         [1, 66],
+          tree:         [1, 200],
           tree_animal:  [1, 66],
           water_animal: [1, 50],
           mountain:     [1, 128]
@@ -71,20 +77,58 @@
         }
       };
       var game = new PuzzleGame(stage, res, state);
-      game.addStartTile(5, 5, 590, 190);
-      game.setupTiles([
-        [605,   5, 190, 190, 'cloud'],
-        [  5, 205, 190, 190, 'mountain'],
-        [205, 205, 190, 190, 'grass'],
-        [405, 205, 190, 190, 'grass'],
-        [605, 205, 190, 190, 'tree'],
-        [  5, 405, 190, 190, 'animal']
-      ]);
-      game.addEndTile(205, 405, 590, 190);
-      game.onGameOver(function () {
+      game.init({
+        start: [5, 5, 590, 190],
+        tiles: [
+          [605,   5, 190, 190, 'cloud'],
+          [  5, 205, 190, 190, 'mountain'],
+          [205, 205, 190, 190, 'grass'],
+          [405, 205, 190, 190, 'grass'],
+          [605, 205, 190, 190, 'tree'],
+          [  5, 405, 190, 190, 'animal']
+        ],
+        end: [205, 405, 590, 190]
+      });
+      game.on('gameover', function () {
+        window.history.pushState({
+          stageId: manager.stageId,
+          stage: true
+        }, "stage#" + manager.stageId, null);
         manager.nextStage();
       });
+      game.on('back', function () {
+        manager.prevStage();
+      });
       game.tick();
+
+      stage.game = game;
+    });
+
+    stageManager.setup(1, function (stage, manager) {
+      stage.game.reset();
+    }, true);
+
+    // the transition screen and start.
+    stageManager.setup(2, function (stage, manager) {
+      var video = document.getElementById('transition-video');
+      video.play();
+      video.addEventListener('ended', function () {
+        video.style.display = 'none';
+      });
+    }, true);
+
+    // the leaf puzzle.
+    stageManager.setup(3, function (stage, manager) {
+    }, true);
+
+    // the organ puzzle.
+    stageManager.setup(4, function (stage, manager) {
+    }, true);
+
+    window.addEventListener('popstate', function (event) {
+      if(event.state && event.state.stage) {
+        stageManager.gotoStage(event.state.stageId);
+      }
     });
   });
 

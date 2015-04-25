@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/stage.css" />
     <script src="vender/createjs/easeljs-0.8.0.min.js"></script>
+    <script src="vender/createjs/tweenjs-0.6.0.min.js"></script>
+    <script src="vender/createjs/soundjs-0.6.0.min.js"></script>
     <script src="js/stage-manager.js"></script>
     <script src="js/puzzle.js"></script>
     <script src="js/main.js"></script>
@@ -17,7 +19,7 @@
       <div id="created" class="brand">Demo</div>
       <div id="stage">
         <div id="welcome" class="welcome stage">
-          <video id="preview" autoplay="true">
+          <video id="welcome-video" autoplay="true">
             <source src="res/gas.mp4" type="video/mp4" />
           </video>
           <div class="controls">
@@ -25,8 +27,12 @@
           </div>
         </div>
         <canvas id="puzzle" class="puzzle stage" width="800" height="600"></canvas>
-        <div id="end" class="end stage">
-          <h1>Thanks for playing this game.</h1>
+        <div id="start" class="transition stage">
+          <video id="start-video">
+            <source src="res/start.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div id="">
         </div>
       </div>
     </div>

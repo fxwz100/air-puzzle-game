@@ -15,27 +15,27 @@
         // try to setup the element.
         this.container = id;
       }
-//      this.container.className = 'state-0';
       this.container.dataset.state = this.stageId = 0;
       this.stages = this.container.getElementsByClassName('stage');
       this.stageListeners = {};
     }
 
     StageManager.prototype.nextStage = function () {
-      this.gotoStage(++this.stageId);
+      var stageId = this.stageId + 1;
+      this.gotoStage(stageId);
     };
 
     StageManager.prototype.prevStage = function () {
-      this.gotoStage(--this.stageId);
+      var stageId = this.stageId - 1;
+      this.gotoStage(stageId);
     };
 
     StageManager.prototype.gotoStage = function (i) {
       this.stageId = i;
       this.container.dataset.state = this.stageId;
-//      this.container.className = 'state-' + this.stageId;
       if (this.stageListeners[i]) {
         var manager = this;
-        this.stageListeners.forEach(function (listener) {
+        this.stageListeners[i].forEach(function (listener) {
           listener(this.stages[i], manager);
         });
       }
