@@ -57,8 +57,10 @@
   opacity: 0;
 }
 
-#stage[data-state="2"] .end.stage {
+#stage[data-state="2"] .transition.stage {
   z-index: 100;
   opacity: 1;
 }
+
+
 

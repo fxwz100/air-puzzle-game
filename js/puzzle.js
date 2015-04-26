@@ -5,7 +5,7 @@
 
   // Tile Class
   var Tile = (function () {
-    function Tile(x, y, width, height, name, game) {
+    function Tile(x, y, width, height, name, game, spriteSheet) {
       this.Container_constructor();
 
       this.x = this.originX = x;
@@ -17,6 +17,7 @@
       this.name = name;
 
       this.game = game;
+      this.spriteSheet = spriteSheet;
 
       this.setup();
     }
@@ -36,7 +37,7 @@
       label.y = this.height / 2;
       this.addChild(label);
 
-      var sprite = this.sprite = new createjs.Sprite(this.game.spriteSheet);
+      var sprite = this.sprite = new createjs.Sprite(this.spriteSheet);
       sprite.x = 0;
       sprite.y = 0;
       sprite.gotoAndStop(this.name + '_start');
@@ -91,7 +92,7 @@
   }());
 
   var StartTile = (function () {
-    function StartTile(x, y, width, height, game) {
+    function StartTile(x, y, width, height, game, spriteSheet) {
       this.Container_constructor();
 
       this.x = this.originX = x;
@@ -102,12 +103,9 @@
       this.name = 'start';
 
       this.game = game;
+      this.spriteSheet = spriteSheet;
 
       this.setup();
-
-      this.game.on('gameover', function () {
-        this.pauseBtn.visible = false;
-      });
     }
 
     var StartTileClass = createjs.extend(StartTile, createjs.Container);
@@ -120,14 +118,11 @@
       background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
       this.addChild(background);
 
-//      var sprite = this.sprite = new createjs.Sprite(spriteSheet);
-//      sprite.x = this.width / 2;
-//      sprite.y = 0;
-////      sprite.visible = false;
-////      sprite.scaleX = 0.2;
-////      sprite.scaleY = 0.2;
-//       sprite.gotoAndStop(this.name + '_start');
-//      this.addChild(sprite);
+      var sprite = this.sprite = new createjs.Sprite(this.spriteSheet);
+      sprite.x = 0;
+      sprite.y = 0;
+      sprite.gotoAndStop(this.name + '_start');
+      this.addChild(sprite);
 
       var startBtn = this.startBtn = new createjs.Shape();
       startBtn.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
@@ -176,19 +171,18 @@
     };
 
     StartTileClass.play = function (tile, callback) {
-//      this.sprite.visible = true;
-//      this.sprite.gotoAndPlay(this.name + '_play');
-//      this.sprite.on('animationend', function () {
-//        callback(this);
-//      }, this, true);
-      callback(this);
+      this.sprite.visible = true;
+      this.sprite.gotoAndPlay(this.name + '_play');
+      this.sprite.on('animationend', function () {
+        callback(this);
+      }, this, true);
     };
 
     return createjs.promote(StartTile, "Container");
   }());
 
   var EndTile = (function () {
-    function EndTile(x, y, width, height, game) {
+    function EndTile(x, y, width, height, game, spriteSheet) {
       this.Container_constructor();
 
       this.x = this.originX = x;
@@ -199,6 +193,7 @@
       this.name = 'end';
 
       this.game = game;
+      this.spriteSheet = spriteSheet;
 
       this.setup();
     }
@@ -212,6 +207,12 @@
       var background = new createjs.Shape();
       background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
       this.addChild(background);
+      
+      var sprite = this.sprite = new createjs.Sprite(this.spriteSheet);
+      sprite.x = 0;
+      sprite.y = 0;
+      sprite.gotoAndStop(this.name + '_start');
+      this.addChild(sprite);
 
       var continueBtn = this.continueBtn = new createjs.Shape();
       continueBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3 * 2, this.height / 2, this.height / 6).endFill();
@@ -234,6 +235,9 @@
 
       var backBtn = this.backBtn = new createjs.Shape();
       backBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3, this.height / 2, this.height / 6).endFill();
+      backBtn.graphics.beginFill('#efefef').drawCircle(this.width / 3, this.height / 2, this.height / 8).endFill();
+      backBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3, this.height / 2, this.height / 10).endFill();
+      backBtn.graphics.beginFill('#efefef').drawPolyStar(this.width / 3, this.height / 2 - this.height / 9, this.height / 12, 3, 0, 0).endFill();
 
       backBtn.on('rollover', function () {
         this.alpha = 0.4;
@@ -252,42 +256,35 @@
     };
 
     EndTileClass.play = function (tile, callback) {
-      this.continueBtn.visible = true;
-      this.continueBtn.alpha = 0;
-      createjs.Tween.get(this.continueBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
+      this.sprite.gotoAndPlay(this.name + '_play');
+      this.sprite.on('animationend', function () {
+        this.continueBtn.visible = true;
+        this.continueBtn.alpha = 0;
+        createjs.Tween.get(this.continueBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
 
-      this.backBtn.visible = true;
-      this.backBtn.alpha = 0;
-      createjs.Tween.get(this.backBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
+        this.backBtn.visible = true;
+        this.backBtn.alpha = 0;
+        createjs.Tween.get(this.backBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
+        
+        callback(this);
+      }, this, true);
     };
 
     return createjs.promote(EndTile, "Container");
   }());
 
   var PuzzleGame = (function () {
-    function PuzzleGame(id, res, state) {
+    function PuzzleGame(id, state) {
       this.stage = new createjs.Stage(id);
       this.stage.enableMouseOver(20);
       this.tiles = [];
-      this.spriteSheet = new createjs.SpriteSheet({
-        images: res.images.list,
-        frames: {
-          "regX": 0,
-          "regY": 0,
-          "count": res.images.list.length,
-          "height": res.images.height,
-          "width": res.images.width
-        },
-        animations: res.animations,
-        framerate: 24
-      });
       this.state = state;
     }
 
     createjs.EventDispatcher.initialize(PuzzleGame.prototype);
 
-    PuzzleGame.prototype.addStartTile = function (x, y, w, h) {
-      var startTile = this.startTile = this.stage.addChild(new StartTile(x, y, w, h, this));
+    PuzzleGame.prototype.addStartTile = function (x, y, w, h, spriteSheet) {
+      var startTile = this.startTile = this.stage.addChild(new StartTile(x, y, w, h, this, spriteSheet));
       var game = this;
       var index = -1;
       function play(tile) {
@@ -334,8 +331,8 @@
       return this;
     };
 
-    PuzzleGame.prototype.addTile = function (x, y, w, h, name) {
-      this.tiles.push(this.stage.addChild(new Tile(x, y, w, h, name, this)));
+    PuzzleGame.prototype.addTile = function (x, y, w, h, name, spriteSheet) {
+      this.tiles.push(this.stage.addChild(new Tile(x, y, w, h, name, this, spriteSheet)));
       return this;
     };
 
@@ -343,13 +340,13 @@
       var game = this;
       this.tiles = [];
       tiles.forEach(function (def) {
-        game.addTile(def[0], def[1], def[2], def[3], def[4], def[5]);
+        game.addTile.apply(game, def);
       });
     };
 
-    PuzzleGame.prototype.addEndTile = function (x, y, w, h) {
+    PuzzleGame.prototype.addEndTile = function (x, y, w, h, spriteSheet) {
       var game = this;
-      this.endTile = this.stage.addChild(new EndTile(x, y, w, h, this));
+      this.endTile = this.stage.addChild(new EndTile(x, y, w, h, this, spriteSheet));
       this.endTile.on('end', function () {
         game.dispatchEvent('gameover');
       });
