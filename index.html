@@ -21,26 +21,36 @@
       <div id="stage">
         <div id="welcome" class="welcome stage">
           <video id="welcome-video" autoplay="true">
-            <source src="res/gas.mp4" type="video/mp4" />
+            <source src="res/video-1.mp4" type="video/mp4" />
           </video>
           <div class="controls">
             <button id="start-btn" class="btn hidden"><i class="fa fa-play"></i></button>
           </div>
         </div>
         <div id="puzzle-1" class="puzzle-1 stage">
-          <div class="tips bounceIn">
-            <i class="fa fa-hand-o-left fa-2x animated swing infinite"></i>这是一个拼图游戏，你可以试试拖动不同的拼图，不同的拼图组合会生成不同的动画，让玩家了解这个拼图游戏的乐趣。
-          </div>
           <canvas id="puzzle-1-canvas" width="800" height="600"></canvas>
         </div>
-        <div id="start" class="transition stage">
-          <video id="start-video">
-            <source src="res/start.mp4" type="video/mp4" />
+        <div id="start" class="start stage">
+          <canvas id="start-canvas" width="800" height="600"></canvas>
+        </div>
+        <div id="leaf-start" class="leaf-start stage">
+          <video id="leaf-video" class="video">
+            <source src="res/video-2.mp4" type="video/mp4" />
           </video>
         </div>
-        <div id="">
+        <div id="leaf-puzzle" class="leaf-puzzle stage">
+          <canvas id="leaf-canvas" width="800" height="600"></canvas>
+        </div>
+        <div id="car-start" class="car-start stage">
+          <video id="car-video" class="video">
+            <source src="res/video-3.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div id="thanks" class="thanks stage">
+          <div class="title">谢谢观看 ╮(╯_╰)╭</div>
         </div>
       </div>
     </div>
+    <audio src="res/flowerdance.mp3" autoplay="true"></audio>
   </body>
 </html>

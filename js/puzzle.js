@@ -8,11 +8,21 @@
     function Tile(x, y, width, height, name, game, spriteSheet) {
       this.Container_constructor();
 
-      this.x = this.originX = x;
-      this.y = this.originY = y;
+      this.x = x + width / 2;
+      this.y = y + height / 2;
+
+      this.regX = width / 2;
+      this.regY = height / 2;
+
+      this.originX = x + width / 2;
+      this.originY = y + height / 2;
+
       this.width = width;
       this.height = height;
       this.color = '#efefef';
+
+      this.alpha = 0;
+      createjs.Tween.get(this).wait(Math.random() * 1000).to({ alpha: 0.6 }, 1000, createjs.Ease.cubicIn);
 
       this.name = name;
 
@@ -53,8 +63,8 @@
 
       this.on("pressmove", function (evt) {
         this.stage.setChildIndex(this, 0);
-        evt.currentTarget.x = evt.stageX - this.width / 2;
-        evt.currentTarget.y = evt.stageY - this.height / 2;
+        evt.currentTarget.x = evt.stageX;// - this.width;
+        evt.currentTarget.y = evt.stageY;// - this.height;
       });
       this.on("pressup", function (evt) {
         var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
@@ -89,7 +99,7 @@
     };
 
     return createjs.promote(Tile, "Container");
-  }());
+  } ());
 
   var StartTile = (function () {
     function StartTile(x, y, width, height, game, spriteSheet) {
@@ -99,6 +109,9 @@
       this.y = this.originY = y;
       this.width = width;
       this.height = height;
+
+      this.alpha = 0;
+      createjs.Tween.get(this).to({ alpha: 1 }, 1000, createjs.Ease.cubicIn);
 
       this.name = 'start';
 
@@ -112,6 +125,7 @@
 
     StartTileClass.setup = function () {
       var self = this;
+
       this.removeAllChildren();
 
       var background = new createjs.Shape();
@@ -125,8 +139,24 @@
       this.addChild(sprite);
 
       var startBtn = this.startBtn = new createjs.Shape();
-      startBtn.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
-      startBtn.graphics.beginFill('#df1').drawPolyStar(this.width / 2, this.height / 2, this.height / 6, 3, 0, 0).endFill();
+      startBtn.graphics.beginFill('#aaa').drawCircle(0, 0, this.height / 4).endFill();
+      startBtn.graphics.beginFill('#df1').drawPolyStar(0, 0, this.height / 6, 3, 0, 0).endFill();
+      startBtn.x = this.width / 2;
+      startBtn.y = this.height / 2;
+      startBtn.show = function () {
+        this.alpha = 0;
+        startBtn.visible = true;
+        createjs.Tween.get(this).to({
+          alpha: 1
+        }, 1000, createjs.Ease.getPowInOut(10));
+      };
+      startBtn.hide = function () {
+        createjs.Tween.get(this).to({
+          alpha: 0
+        }, 1000, createjs.Ease.getPowInOut(10)).call(function () {
+          startBtn.visible = false;
+        });
+      };
 
       startBtn.on('rollover', function () {
         this.alpha = 0.4;
@@ -137,15 +167,39 @@
 
       startBtn.on('click', function () {
         this.visible = false;
-        self.pauseBtn.visible = true;
+        self.pauseBtn.show();
         self.dispatchEvent('start');
       });
 
       this.addChild(startBtn);
 
       var pauseBtn = this.pauseBtn = new createjs.Shape();
-      pauseBtn.graphics.beginFill('#aaa').drawCircle(this.width / 2, this.height / 2, this.height / 4).endFill();
-      pauseBtn.graphics.beginFill('#df1').drawRoundRect(this.width / 2 - 18, this.height / 2 - 18, 36, 36, 10, 10).endFill();
+      pauseBtn.graphics.beginFill('#aaa').drawCircle(0, 0, this.height / 4).endFill();
+      pauseBtn.graphics.beginFill('#df1').drawRoundRect(-18, -18, 36, 36, 10, 10).endFill();
+      pauseBtn.x = this.width / 2;
+      pauseBtn.y = this.height / 2;
+      pauseBtn.show = function () {
+        this.alpha = 0;
+        this.visible = true;
+        createjs.Tween.get(this).to({
+          x: self.height / 4,
+          y: self.height / 4 * 3,
+          scaleX: 0.5,
+          scaleY: 0.5,
+          alpha: 1
+        }, 500, createjs.Ease.getPowInOut(10));
+      };
+      pauseBtn.hide = function () {
+        createjs.Tween.get(this).to({
+          x: self.width / 2,
+          y: self.height / 2,
+          scaleX: 1,
+          scaleY: 1,
+          alpha: 0
+        }, 500, createjs.Ease.getPowInOut(10)).call(function () {
+          pauseBtn.visible = false;
+        });
+      };
 
       pauseBtn.on('rollover', function () {
         this.alpha = 0.4;
@@ -156,7 +210,7 @@
 
       pauseBtn.on('click', function () {
         this.visible = false;
-        self.startBtn.visible = true;
+        self.startBtn.show();
         self.dispatchEvent('pause');
       });
 
@@ -166,7 +220,7 @@
       this.pauseBtn.visible = false;
 
       this.game.on('animation-end', function () {
-        self.pauseBtn.visible = false;
+        self.pauseBtn.hide();
       });
     };
 
@@ -179,7 +233,7 @@
     };
 
     return createjs.promote(StartTile, "Container");
-  }());
+  } ());
 
   var EndTile = (function () {
     function EndTile(x, y, width, height, game, spriteSheet) {
@@ -189,6 +243,9 @@
       this.y = this.originY = y;
       this.width = width;
       this.height = height;
+
+      this.alpha = 0;
+      createjs.Tween.get(this).to({ alpha: 1.0 }, 1000, createjs.Ease.cubicIn);
 
       this.name = 'end';
 
@@ -207,7 +264,7 @@
       var background = new createjs.Shape();
       background.graphics.beginFill('#efefef').drawRoundRect(0, 0, this.width, this.height, 10).endFill();
       this.addChild(background);
-      
+
       var sprite = this.sprite = new createjs.Sprite(this.spriteSheet);
       sprite.x = 0;
       sprite.y = 0;
@@ -260,18 +317,37 @@
       this.sprite.on('animationend', function () {
         this.continueBtn.visible = true;
         this.continueBtn.alpha = 0;
-        createjs.Tween.get(this.continueBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
+        createjs.Tween.get(this.continueBtn).to({ alpha: 1 }, 1000, createjs.Ease.getPowInOut(4));
 
         this.backBtn.visible = true;
         this.backBtn.alpha = 0;
-        createjs.Tween.get(this.backBtn).to({ alpha: 1}, 1000, createjs.Ease.getPowInOut(4));
-        
+        createjs.Tween.get(this.backBtn).to({ alpha: 1 }, 1000, createjs.Ease.getPowInOut(4));
+
         callback(this);
       }, this, true);
     };
 
     return createjs.promote(EndTile, "Container");
-  }());
+  } ());
+
+  var Tips = (function () {
+    function Tips() {
+      this.Container_constructor();
+
+      this.x = 0;
+      this.y = 0;
+      
+      this.setup();
+    }
+
+    var TipsClass = createjs.extend(EndTile, createjs.Container);
+    
+    TipsClass.setup = function () {
+      // draw the screen.
+    };
+
+    return createjs.promote(Tips, "Container");
+  } ());
 
   var PuzzleGame = (function () {
     function PuzzleGame(id, state) {
@@ -371,24 +447,35 @@
 
     PuzzleGame.prototype.init = function (initDef) {
       this.initDef = initDef;
+
       setup(this, this.initDef);
+
+      var tips = new Tips(0, 0, this.width, this.height);
+      this.stage.addChild(tips);
+
+      tips.on('click', function () {
+        tips.visible = false;
+      });
     };
 
     PuzzleGame.prototype.reset = function () {
-      if (this.initDef) {
-        setup(this, this.initDef);
-        if (this.startTile) {
-          this.startTile.setup();
-        }
-        if (this.tiles) {
-          this.tiles.forEach(function (tile) {
-            tile.setup();
-          });
-        }
-        if (this.endTile) {
-          this.endTile.setup();
+      if (this.isNotFirstRun) {
+        if (this.initDef) {
+          setup(this, this.initDef);
+          if (this.startTile) {
+            this.startTile.setup();
+          }
+          if (this.tiles) {
+            this.tiles.forEach(function (tile) {
+              tile.setup();
+            });
+          }
+          if (this.endTile) {
+            this.endTile.setup();
+          }
         }
       }
+      this.isNotFirstRun = true;
     };
 
     PuzzleGame.prototype.tick = function () {
@@ -397,8 +484,8 @@
     };
 
     return PuzzleGame;
-  }());
+  } ());
 
   exports.PuzzleGame = PuzzleGame;
 
-}(window));
+} (window));
