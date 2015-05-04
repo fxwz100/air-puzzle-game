@@ -62,9 +62,9 @@
       });
 
       this.on("pressmove", function (evt) {
-        this.stage.setChildIndex(this, 0);
-        evt.currentTarget.x = evt.stageX;// - this.width;
-        evt.currentTarget.y = evt.stageY;// - this.height;
+        this.stage.setChildIndex(this, 1);
+        evt.currentTarget.x = evt.stageX;
+        evt.currentTarget.y = evt.stageY;
       });
       this.on("pressup", function (evt) {
         var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
@@ -99,7 +99,7 @@
     };
 
     return createjs.promote(Tile, "Container");
-  } ());
+  }());
 
   var StartTile = (function () {
     function StartTile(x, y, width, height, game, spriteSheet) {
@@ -233,7 +233,7 @@
     };
 
     return createjs.promote(StartTile, "Container");
-  } ());
+  }());
 
   var EndTile = (function () {
     function EndTile(x, y, width, height, game, spriteSheet) {
@@ -328,7 +328,7 @@
     };
 
     return createjs.promote(EndTile, "Container");
-  } ());
+  }());
 
   var Tips = (function () {
     function Tips() {
@@ -340,26 +340,29 @@
       this.setup();
     }
 
-    var TipsClass = createjs.extend(EndTile, createjs.Container);
+    var TipsClass = createjs.extend(Tips, createjs.Container);
     
     TipsClass.setup = function () {
       // draw the screen.
     };
 
     return createjs.promote(Tips, "Container");
-  } ());
+  }());
 
   var PuzzleGame = (function () {
-    function PuzzleGame(id, state) {
+    function PuzzleGame(id, state, background) {
       this.stage = new createjs.Stage(id);
       this.stage.enableMouseOver(20);
       this.tiles = [];
       this.state = state;
+      this.background = background;
     }
 
     createjs.EventDispatcher.initialize(PuzzleGame.prototype);
+    
+    var PuzzleGameClass = PuzzleGame.prototype;
 
-    PuzzleGame.prototype.addStartTile = function (x, y, w, h, spriteSheet) {
+    PuzzleGameClass.addStartTile = function (x, y, w, h, spriteSheet) {
       var startTile = this.startTile = this.stage.addChild(new StartTile(x, y, w, h, this, spriteSheet));
       var game = this;
       var index = -1;
@@ -412,7 +415,7 @@
       return this;
     };
 
-    PuzzleGame.prototype.setupTiles = function (tiles) {
+    PuzzleGameClass.setupTiles = function (tiles) {
       var game = this;
       this.tiles = [];
       tiles.forEach(function (def) {
@@ -420,7 +423,7 @@
       });
     };
 
-    PuzzleGame.prototype.addEndTile = function (x, y, w, h, spriteSheet) {
+    PuzzleGameClass.addEndTile = function (x, y, w, h, spriteSheet) {
       var game = this;
       this.endTile = this.stage.addChild(new EndTile(x, y, w, h, this, spriteSheet));
       this.endTile.on('end', function () {
@@ -434,6 +437,9 @@
 
     function setup(puzzle, initDef) {
       puzzle.stage.removeAllChildren();
+      if (puzzle.background) {
+        puzzle.stage.addChild(puzzle.background);
+      }
       if (initDef.start) {
         puzzle.addStartTile.apply(puzzle, initDef.start);
       }
@@ -445,7 +451,7 @@
       }
     }
 
-    PuzzleGame.prototype.init = function (initDef) {
+    PuzzleGameClass.init = function (initDef) {
       this.initDef = initDef;
 
       setup(this, this.initDef);
@@ -458,7 +464,7 @@
       });
     };
 
-    PuzzleGame.prototype.reset = function () {
+    PuzzleGameClass.reset = function () {
       if (this.isNotFirstRun) {
         if (this.initDef) {
           setup(this, this.initDef);
@@ -478,14 +484,19 @@
       this.isNotFirstRun = true;
     };
 
-    PuzzleGame.prototype.tick = function () {
-      createjs.Ticker.setFPS(60);
+    PuzzleGameClass.tick = function () {
+      createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+      createjs.Ticker.setFPS(30);
       createjs.Ticker.on("tick", this.stage);
+    };
+    
+    PuzzleGameClass.untick = function () {
+      createjs.Ticker.off('tick', this.stage);
     };
 
     return PuzzleGame;
-  } ());
+  }());
 
   exports.PuzzleGame = PuzzleGame;
 
-} (window));
+}(window));

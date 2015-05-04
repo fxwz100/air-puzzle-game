@@ -1,4 +1,4 @@
-/*globals PuzzleGame */
+/*globals createjs */
 /*jslint browser: true, vars: true, plusplus: true */
 (function (exports) {
   "use strict";
@@ -19,38 +19,40 @@
       this.stages = this.container.getElementsByClassName('stage');
       this.stageListeners = {};
     }
+    
+    var StageManagerClass = StageManager.prototype;
+    
+    /** Dispatch a specific type of event. */
+    function dispatchEvent(dispatcher, type, stage) {
+      var event = dispatchEvent.event;
+      event.type = type;
+      event.target = dispatcher;
+      event.currentTarget = dispatcher;
+      event.stage = stage;
+      dispatcher.dispatchEvent(event);
+    }
+    dispatchEvent.event = new Object;
+    
+    createjs.EventDispatcher.initialize(StageManagerClass);
 
-    StageManager.prototype.nextStage = function () {
+    StageManagerClass.nextStage = function () {
       var stageId = this.stageId + 1;
       this.gotoStage(stageId);
     };
 
-    StageManager.prototype.prevStage = function () {
+    StageManagerClass.prevStage = function () {
       var stageId = this.stageId - 1;
       this.gotoStage(stageId);
     };
 
-    StageManager.prototype.gotoStage = function (i) {
-      this.stageId = i;
-      this.container.dataset.state = this.stageId;
-      if (this.stageListeners[i]) {
-        var manager = this;
-        this.stageListeners[i].forEach(function (listener) {
-          listener(manager.stages[i], manager);
-        });
-      }
+    StageManagerClass.gotoStage = function (i) {
+      dispatchEvent(this, 'goto-' + this.stageId + '-done', this.stages[this.stageId]);
+      this.container.dataset.state = this.stageId = i;
+      dispatchEvent(this, 'goto-' + i, this.stages[i]);
     };
 
-    StageManager.prototype.setup = function (i, func, lazy) {
-      if (lazy) {
-        if (this.stageListeners[i]) {
-          this.stageListeners[i].push(func);
-        } else {
-          this.stageListeners[i] = [func];
-        }
-      } else {
-        func(this.stages[i], this);
-      }
+    StageManagerClass.setup = function (i, func) {
+      func(this.stages[i], this);
     };
 
     return StageManager;

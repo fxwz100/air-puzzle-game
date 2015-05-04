@@ -53,24 +53,32 @@
   opacity: 1;
 }
 
-/*
-#stage[data-state="4"] .car-start.stage {
-  z-index: 100;
-  opacity: 1;
-}
-*/
-
 #stage[data-state="4"] .leaf-puzzle.stage {
   z-index: 100;
   opacity: 1;
 }
 
-#stage[data-state="5"] .car-start.stage {
+#stage[data-state="5"] .train-start.stage {
   z-index: 100;
   opacity: 1;
 }
 
-#stage[data-state="6"] .thanks.stage {
+#stage[data-state="6"] .train-puzzle.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="7"] .factory-start.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="8"] .factory-puzzle.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="9"] .thanks.stage {
   z-index: 100;
   opacity: 1;
 }

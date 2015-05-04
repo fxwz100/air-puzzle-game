@@ -12,6 +12,7 @@
     <script src="vender/createjs/tweenjs-0.6.0.min.js"></script>
     <script src="vender/createjs/soundjs-0.6.0.min.js"></script>
     <script src="js/stage-manager.js"></script>
+    <script src="js/maze-puzzle.js"></script>
     <script src="js/puzzle.js"></script>
     <script src="js/main.js"></script>
   </head>
@@ -27,25 +28,41 @@
             <button id="start-btn" class="btn hidden"><i class="fa fa-play"></i></button>
           </div>
         </div>
+        
         <div id="puzzle-1" class="puzzle-1 stage">
           <canvas id="puzzle-1-canvas" width="800" height="600"></canvas>
         </div>
         <div id="start" class="start stage">
           <canvas id="start-canvas" width="800" height="600"></canvas>
         </div>
+        
         <div id="leaf-start" class="leaf-start stage">
           <video id="leaf-video" class="video">
-            <source src="res/video-2.mp4" type="video/mp4" />
+            <source src="res/start/leaf.mp4" type="video/mp4" />
           </video>
         </div>
         <div id="leaf-puzzle" class="leaf-puzzle stage">
           <canvas id="leaf-canvas" width="800" height="600"></canvas>
         </div>
-        <div id="car-start" class="car-start stage">
-          <video id="car-video" class="video">
-            <source src="res/video-3.mp4" type="video/mp4" />
+        
+        <div id="train-start" class="train-start stage">
+          <video id="train-video" class="video">
+            <source src="res/start/train.mp4" type="video/mp4" />
           </video>
         </div>
+        <div id="train-puzzle" class="train-puzzle stage">
+          <canvas id="train-canvas" width="800" height="600"></canvas>
+        </div>
+        
+        <div id="factory-start" class="factory-start stage">
+          <video id="factory-video" class="video">
+            <source src="res/start/factory.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div id="factory-puzzle" class="factory-puzzle stage">
+          <canvas id="factory-canvas" width="800" height="600"></canvas>
+        </div>
+        
         <div id="thanks" class="thanks stage">
           <div class="title">谢谢观看 ╮(╯_╰)╭</div>
         </div>

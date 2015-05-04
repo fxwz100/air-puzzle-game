@@ -1,13 +1,17 @@
-/*globals StageManager, PuzzleGame, createjs */
+/*globals StageManager, MazePuzzle, PuzzleGame, createjs */
 /*jslint vars: true, plusplus: true */
 (function () {
   "use strict";
 
-  function createSpriteSheetFromSeq(res, prefix) {
+  function createSpriteSheetFromSeq(res) {
+    if (!res.postfix) {
+      res.postfix = '.jpg';
+    }
+    
     var images = Object.keys(res.images).map(function (name) {
       var r = res.images[name], l = [], i;
       for (i = r[0]; i <= r[1]; i++) {
-        l.push(res.prefix + name + '/' + i + '.jpg');
+        l.push(res.prefix + name + '/' + i + res.postfix);
       }
       return l;
     }).reduce(function (c, it) {
@@ -16,7 +20,10 @@
 
     var animations = Object.keys(res.images).reduce(function (result, name) {
       result.anim[name + '_start'] = result.count;
-      result.anim[name + '_play'] = [result.count, result.count + res.images[name][1] - 1, name + '_end'];
+      result.anim[name + '_play'] = [result.count, result.count + res.images[name][1] - 1];
+      if (!res.loop) {
+        result.anim[name + '_play'].push(name + '_end');
+      }
       result.anim[name + '_end'] = result.count + res.images[name][1] - 1;
       result.count += res.images[name][1];
       return result;
@@ -53,8 +60,8 @@
           stageId: manager.stageId,
           stage: true
         }, "stage#" + manager.stageId, null);
-        manager.nextStage();
-        //        manager.gotoStage(3);
+//        manager.nextStage();
+        manager.gotoStage(6);
       });
     });
 
@@ -132,57 +139,306 @@
       stage.game = game;
     });
 
-    stageManager.setup(1, function (stage, manager) {
+    stageManager.on('goto-1', function (evt) {
+      var stage = evt.stage;
       stage.game.reset();
-    }, true);
-
-    // the transition screen and start.
+      stage.game.tick();
+    });
+    
+    stageManager.on('goto-1-done', function (evt) {
+      var stage = evt.stage;
+      stage.game.untick();
+    });
+    
     stageManager.setup(2, function (stage_element, manager) {
       var stage = new createjs.Stage('start-canvas');
-      var bitmap = new createjs.Bitmap('res/start/1.jpg');
+      stage.enableMouseOver(20);
+  
+      var bitmap = new createjs.Bitmap('res/start/main.jpg');
       stage.addChild(bitmap);
-      var leafBtn = new createjs.Bitmap('res/start/leaf-btn.png');
-      leafBtn.x = 300;
-      leafBtn.y = 200;
-      createjs.Tween.get(leafBtn, { loop: true })
-        .to({ alpha: 1 }, 1000, createjs.Ease.getPowInOut(4))
-        .to({ alpha: 0.4 }, 1000, createjs.Ease.getPowInOut(3))
-        .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(4));
-      stage.addChild(leafBtn);
+  
+      var leafBtn = new createjs.Bitmap('res/start/leaf.png');
+      leafBtn.x = 70;
+      leafBtn.y = 227;
+      leafBtn.alpha = 0.8;
+      var leafAnim = createjs.Tween.get(leafBtn, { loop: true })
+        .to({ scaleX: 1.2, scaleY: 1.2}, 600, createjs.Ease.cubicIn)
+        .to({ scaleX: 1, scaleY: 1}, 600, createjs.Ease.cubicIn);
+      leafAnim.setPaused(true);
+      leafBtn.on('rollover', function () {
+        leafBtn.alpha = 1;
+        leafAnim.setPaused(false);
+      });
+      leafBtn.on('rollout', function () {
+        leafBtn.alpha = 0.8;
+        leafAnim.setPaused(true);
+      });
       leafBtn.on('click', function () {
         manager.nextStage();
       });
+  
+      var trainBtn = new createjs.Sprite(createSpriteSheetFromSeq({
+        images: {train: [1, 26]},
+        frames: {width: 201, height: 143},
+        prefix: 'res/start/main/',
+        postfix: '.png',
+        loop: true
+      }), 'train_start');
+      trainBtn.x = 350;
+      trainBtn.y = 300;
+      trainBtn.alpha = 0.8;
+      trainBtn.on('rollover', function () {
+        trainBtn.alpha = 1;
+        trainBtn.gotoAndPlay('train_play');
+      });
+      trainBtn.on('rollout', function () {
+        trainBtn.alpha = 0.8;
+        trainBtn.gotoAndStop('train_start');
+      });
+      trainBtn.on('click', function () {
+        manager.gotoStage(5);
+      });
+  
+      var factoryBtn = new createjs.Sprite(createSpriteSheetFromSeq({
+        images: {factory: [1, 26]},
+        frames: {width: 800, height: 527},
+        prefix: 'res/start/main/',
+        postfix: '.png',
+        loop: true
+      }), 'factory_start');
+      factoryBtn.x = 30;
+      factoryBtn.y = 40;
+      factoryBtn.alpha = 0.8;
+      factoryBtn.on('rollover', function () {
+        factoryBtn.alpha = 1;
+        factoryBtn.gotoAndPlay('factory_play');
+      });
+      factoryBtn.on('rollout', function () {
+        factoryBtn.alpha = 0.8;
+        factoryBtn.gotoAndStop('factory_start');
+      });
+      factoryBtn.on('click', function () {
+        manager.gotoStage(7);
+      });
+      
+//      createjs.Tween.get(trainBtn, { loop: true })
+//        .to({ scaleX: 1.1, scaleY: 1.1}, 1000, createjs.Ease.cubicIn)
+//        .to({ scaleX: 1, scaleY: 1}, 1000, createjs.Ease.cubicIn);
+      
+      var humanBtn = new createjs.Sprite(createSpriteSheetFromSeq({
+        images: {human: [1, 19]},
+        frames: {width: 800, height: 527},
+        prefix: 'res/start/main/',
+        postfix: '.png',
+        loop: true
+      }), 'human_start');
+      humanBtn.y = 70;
+      humanBtn.alpha = 0.8;
+      humanBtn.on('rollover', function () {
+        humanBtn.alpha = 1;
+        humanBtn.gotoAndPlay('human_play');
+      });
+      humanBtn.on('rollout', function () {
+        humanBtn.alpha = 0.8;
+        humanBtn.gotoAndStop('human_play');
+      });
+      humanBtn.on('click', function () {
+        manager.gotoStage(9);
+      });
+      
+      stage.addChild(leafBtn, trainBtn, factoryBtn, humanBtn);
+      
+      stage_element.stage = stage;
+    });
+
+    // the transition screen and start.
+    stageManager.on('goto-2', function (evt) {
+      var stage = evt.stage.stage;
       createjs.Ticker.on("tick", stage);
-    }, true);
-    
+    });
+
+    stageManager.on('goto-2-done', function (evt) {
+      var stage = evt.stage.stage;
+      createjs.Ticker.off("tick", stage);
+    });
+
     // start screen.
-    stageManager.setup(3, function (stage, manager) {
+    stageManager.on('goto-3', function (evt) {
+      var manager = evt.target;
       var video = document.getElementById('leaf-video');
       video.play();
       video.addEventListener('ended', function () {
         manager.nextStage();
       });
-    }, true);
+    });
 
     // the leaf puzzle.
-    stageManager.setup(4, function (stage_element, manager) {
+    stageManager.on('goto-4', function (evt) {
+      var manager = evt.target;
       var stage = new createjs.Stage('leaf-canvas');
       var bitmap = new createjs.Bitmap('res/leaf-puzzle/preview.jpg');
       bitmap.on('click', function () {
-        manager.nextStage();
+        manager.gotoStage(2);
       });
       stage.addChild(bitmap);
       createjs.Ticker.on("tick", stage);
-    }, true);
-    
-    // the car start screen.
-    stageManager.setup(5, function (stage, manager) {
-      var video = document.getElementById('car-video');
+    });
+
+    // the train start screen.
+    stageManager.on('goto-5', function (evt) {
+      var manager = evt.target;
+      var video = document.getElementById('train-video');
       video.play();
       video.addEventListener('ended', function () {
         manager.nextStage();
       });
-    }, true);
+    });
+    
+    // the train puzzle.
+    stageManager.setup(6, function (stage, manager) {
+      var state = {
+        '1-1': {
+          '4-2': {
+            animation: '4-1_play',
+            condition: function (game) {
+              return game.index === 2;
+            }
+          },
+          '6-1': {
+            animation: '6-2_play'
+          }
+        },
+        '3': {
+          '4-2': {
+            animation: '4-1_play',
+            condition: function (game) {
+              return game.index === 2;
+            }
+          },
+          '6-1': {
+            animation: '6-2_play'
+          }
+        },
+        '4-2': {
+          '5-1': {
+            animation: '5-2_play'
+          },
+          '6-1': {
+            animation: '6-2_play'
+          }
+        },
+        '5-1': {
+          '4-2': {
+            animation: '4-1_play',
+            condition: function (game) {
+              return game.index === 2;
+            }
+          },
+          '6-1': {
+            animation: '6-2_play',
+            condition: function (game) {
+              return game.index === 4;
+            }
+          }
+        }
+      };
+      var tileSpriteSheet = createSpriteSheetFromSeq({
+        images: {
+          start: [1, 101],
+          '2-1': [1, 90],
+          '2-2': [1, 90],
+          '3':   [1, 110],
+          '4-1': [1, 70],
+          '4-2': [1, 70],
+          '5-1': [1, 90],
+          '5-2': [1, 90],
+          '6-1': [1, 70],
+          '6-2': [1, 75]
+        },
+        frames: {
+          width: 190,
+          height: 190
+        },
+        prefix: 'res/train-puzzle/'
+      });
+      var specialTileSpriteSheet = createSpriteSheetFromSeq({
+        images: {
+          end: [1, 100]
+        },
+        frames: {
+          width: 150,
+          height: 190
+        },
+        prefix: 'res/train-puzzle/'
+      });
+      
+      var bitmap = new createjs.Bitmap('res/train-puzzle/background.jpg');
+      bitmap.mouseEnabled = false;
+      
+      var game = new MazePuzzle('train-canvas', state, bitmap);
+      
+      game.init({
+        start: [32, 190, 190, 190, tileSpriteSheet],
+        tiles: [
+          [232, 190, 190, 190, '2-1', tileSpriteSheet],
+          [432, 190, 190, 190, '4-2', tileSpriteSheet, true],
+          [ 32, 390, 190, 190, '5-1', tileSpriteSheet],
+          [232, 390, 190, 190, '3', tileSpriteSheet],
+          [432, 390, 190, 190, '6-1', tileSpriteSheet, true]
+        ],
+        end: [642, 222, 150, 190, specialTileSpriteSheet]
+      });
+      
+      game.on('gameover', function () {
+        window.history.pushState({
+          stageId: manager.stageId,
+          stage: true
+        }, "stage#" + manager.stageId, null);
+        manager.nextStage();
+      });
+      
+      game.on('back', function () {
+        stage.game.reset();
+      });
+      
+      game.tick();
+
+      stage.game = game;
+    });
+    
+    // the train puzzle started.
+    stageManager.on('goto-6', function (evt) {
+      var stage = evt.stage.stage;
+      createjs.Ticker.on("tick", stage);
+    });
+    
+    // the train puzzle ended.
+    stageManager.on('goto-6-done', function (evt) {
+      var stage = evt.stage.stage;
+      createjs.Ticker.off("tick", stage);
+    });
+    
+    // the factory start screen.
+    stageManager.on('goto-7', function (evt) {
+      var manager = evt.target;
+      var video = document.getElementById('factory-video');
+      video.play();
+      video.addEventListener('ended', function () {
+        manager.nextStage();
+      });
+    });
+    
+    // the factory puzzle.
+    stageManager.on('goto-8', function (evt) {
+      var manager = evt.target;
+      var stage = new createjs.Stage('factory-canvas');
+      var bitmap = new createjs.Bitmap('res/factory-puzzle/preview.jpg');
+      bitmap.on('click', function () {
+        manager.gotoStage(2);
+      });
+      stage.addChild(bitmap);
+      createjs.Ticker.on("tick", stage);
+    });
 
     window.addEventListener('popstate', function (event) {
       if (event.state && event.state.stage) {
@@ -191,4 +447,4 @@
     });
   });
 
-} ());
+}());
