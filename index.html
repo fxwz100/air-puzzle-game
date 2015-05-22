@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf8" />
-    <title>Air (Desktop)</title>
+    <title>Air</title>
     <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no" />
     <link rel="stylesheet" href="vender/font-awesome-4.3.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="vender/animate.css/animate.css" />
@@ -19,13 +19,20 @@
   <body>
     <div class="container">
       <div id="created" class="brand">Demo</div>
+
       <div id="stage">
         <div id="welcome" class="welcome stage">
           <video id="welcome-video" autoplay="true">
             <source src="res/video-1.mp4" type="video/mp4" />
           </video>
           <div class="controls">
-            <button id="start-btn" class="btn hidden"><i class="fa fa-play"></i></button>
+            <button id="start-btn" class="main btn hidden"><i class="fa fa-play"></i></button>
+<!--
+            <div class="misc">
+              <button id="about-btn" class="btn"><i class="fa fa-question"></i></button>
+              <button id="about-btn" class="btn"><i class="fa fa-music"></i></button>
+            </div>
+-->
           </div>
         </div>
         
@@ -46,7 +53,7 @@
         </div>
         
         <div id="train-start" class="train-start stage">
-          <video id="train-video" class="video">
+          <video id="train-video" class="video" preload="auto">
             <source src="res/start/train.mp4" type="video/mp4" />
           </video>
         </div>
@@ -66,8 +73,10 @@
         <div id="thanks" class="thanks stage">
           <div class="title">谢谢观看 ╮(╯_╰)╭</div>
         </div>
+
       </div>
     </div>
-    <audio src="res/flowerdance.mp3" autoplay="true"></audio>
+
+    <audio src="res/flowerdance.mp3" muted></audio>
   </body>
 </html>

@@ -56,12 +56,12 @@
       });
 
       startBtn.addEventListener('click', function () {
-        window.history.pushState({
-          stageId: manager.stageId,
-          stage: true
-        }, "stage#" + manager.stageId, null);
-//        manager.nextStage();
-        manager.gotoStage(6);
+//        window.history.pushState({
+//          stageId: manager.stageId,
+//          stage: true
+//        }, "stage#" + manager.stageId, null);
+        manager.nextStage();
+//        manager.gotoStage(8);
       });
     });
 
@@ -125,11 +125,11 @@
         end: [205, 405, 590, 190, specialTileSpriteSheet]
       });
       game.on('gameover', function () {
-        window.history.pushState({
-          stageId: manager.stageId,
-          stage: true
-        }, "stage#" + manager.stageId, null);
-        manager.nextStage();
+//        window.history.pushState({
+//          stageId: manager.stageId,
+//          stage: true
+//        }, "stage#" + manager.stageId, null);
+        manager.gotoStage(2);
       });
       game.on('back', function () {
         stage.game.reset();
@@ -390,11 +390,11 @@
       });
       
       game.on('gameover', function () {
-        window.history.pushState({
-          stageId: manager.stageId,
-          stage: true
-        }, "stage#" + manager.stageId, null);
-        manager.nextStage();
+//        window.history.pushState({
+//          stageId: manager.stageId,
+//          stage: true
+//        }, "stage#" + manager.stageId, null);
+        manager.gotoStage(3);
       });
       
       game.on('back', function () {
@@ -429,22 +429,106 @@
     });
     
     // the factory puzzle.
-    stageManager.on('goto-8', function (evt) {
-      var manager = evt.target;
-      var stage = new createjs.Stage('factory-canvas');
-      var bitmap = new createjs.Bitmap('res/factory-puzzle/preview.jpg');
-      bitmap.on('click', function () {
-        manager.gotoStage(2);
+    stageManager.setup(8, function (stage, manager) {
+      var state = {
+        '3': {
+          '2-1': {
+            animation: '2-2_play',
+            condition: function (game) {
+              return false;
+            }
+          },
+          '4': {
+            animation: '4-2_play',
+            condition: function (game) {
+              return false;
+            }
+          }
+        },
+        '4': {
+          '5': {
+            animation: '5_play',
+            condition: function (game) {
+              return game.index === 3;
+            }
+          }
+        }
+      };
+      var tileSpriteSheet = createSpriteSheetFromSeq({
+        images: {
+          '2-1': [1, 99],
+          '2-2': [1, 99],
+          '3':   [1, 81],
+//          '4-1': [1, 70],
+          '4': [1, 102],
+          '5': [1, 99]
+//          '5-2': [1, 90]
+        },
+        frames: {
+          width: 190,
+          height: 190
+        },
+        prefix: 'res/factory-puzzle/'
       });
-      stage.addChild(bitmap);
+      var specialTileSpriteSheet = createSpriteSheetFromSeq({
+        images: {
+          start: [1, 64],
+          end: [1, 64]
+        },
+        frames: {
+          width: 150,
+          height: 450
+        },
+        prefix: 'res/factory-puzzle/'
+      });
+
+      var game = new MazePuzzle('factory-canvas', state);
+
+      game.init({
+        start: [50, 90, 150, 450, specialTileSpriteSheet],
+        tiles: [
+          [210, 90, 190, 190, '3', tileSpriteSheet],
+          [410, 90, 190, 190, '2-1', tileSpriteSheet],
+          [210, 350, 190, 190, '4', tileSpriteSheet],
+          [410, 350, 190, 190, '5', tileSpriteSheet, true]
+        ],
+        end: [610, 90, 150, 450, specialTileSpriteSheet]
+      });
+
+      game.on('gameover', function () {
+//        window.history.pushState({
+//          stageId: manager.stageId,
+//          stage: true
+//        }, "stage#" + manager.stageId, null);
+        manager.gotoStage(3);
+      });
+
+      game.on('back', function () {
+        stage.game.reset();
+      });
+
+      game.tick();
+
+      stage.game = game;
+    });
+
+    // the factory puzzle started.
+    stageManager.on('goto-8', function (evt) {
+      var stage = evt.stage.stage;
       createjs.Ticker.on("tick", stage);
     });
 
-    window.addEventListener('popstate', function (event) {
-      if (event.state && event.state.stage) {
-        stageManager.gotoStage(event.state.stageId);
-      }
+    // the factory puzzle ended.
+    stageManager.on('goto-8-done', function (evt) {
+      var stage = evt.stage.stage;
+      createjs.Ticker.off("tick", stage);
     });
+
+//    window.addEventListener('popstate', function (event) {
+//      if (event.state && event.state.stage) {
+//        stageManager.gotoStage(event.state.stageId);
+//      }
+//    });
   });
 
 }());

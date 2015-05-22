@@ -1,5 +1,12 @@
 /*global createjs */
 /*jslint browser: true, vars: true, plusplus: true */
+/*
+ *
+ * The best gift to Miss. Liu.
+ *
+ *                     by yfwz100
+ *
+ */
 (function (exports) {
   "use strict";
 
@@ -64,13 +71,16 @@
         this.alpha = 0.6;
       });
 
+      this.on("mousedown", function (evt) {
+        this.game.tilesPool.removeChild(this);
+        this.game.selectingLayer.addChild(this);
+      });
       this.on("pressmove", function (evt) {
-        this.stage.setChildIndex(this, 1);
         evt.currentTarget.x = evt.stageX;
         evt.currentTarget.y = evt.stageY;
       });
       this.on("pressup", function (evt) {
-        var obj = this.stage.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
+        var obj = this.game.tilesPool.getObjectUnderPoint(evt.stageX, evt.stageY, 1);
         if (obj) {
           this.x = obj.originX;
           this.y = obj.originY;
@@ -82,6 +92,8 @@
           this.x = this.originX;
           this.y = this.originY;
         }
+        this.game.selectingLayer.removeChild(this);
+        this.game.tilesPool.addChild(this);
       });
       
       if (this.terminated) {
@@ -178,9 +190,11 @@
       sprite.gotoAndStop(this.name + '_start');
       this.addChild(sprite);
 
+      var size = Math.min(this.width, this.height);
+
       var startBtn = this.startBtn = new createjs.Shape();
-      startBtn.graphics.beginFill('#aaa').drawCircle(0, 0, this.height / 4).endFill();
-      startBtn.graphics.beginFill('#df1').drawPolyStar(0, 0, this.height / 6, 3, 0, 0).endFill();
+      startBtn.graphics.beginFill('#aaa').drawCircle(0, 0, size / 4).endFill();
+      startBtn.graphics.beginFill('#df1').drawPolyStar(0, 0, size / 6, 3, 0, 0).endFill();
       startBtn.x = this.width / 2;
       startBtn.y = this.height / 2;
       startBtn.show = function () {
@@ -214,7 +228,7 @@
       this.addChild(startBtn);
 
       var pauseBtn = this.pauseBtn = new createjs.Shape();
-      pauseBtn.graphics.beginFill('#aaa').drawCircle(0, 0, this.height / 4).endFill();
+      pauseBtn.graphics.beginFill('#aaa').drawCircle(0, 0, size / 4).endFill();
       pauseBtn.graphics.beginFill('#df1').drawRoundRect(-18, -18, 36, 36, 10, 10).endFill();
       pauseBtn.x = this.width / 2;
       pauseBtn.y = this.height / 2;
@@ -311,9 +325,13 @@
       sprite.gotoAndStop(this.name + '_start');
       this.addChild(sprite);
 
+      var size = Math.min(this.width, this.height);
+
       var continueBtn = this.continueBtn = new createjs.Shape();
-      continueBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3 * 2, this.height / 2, this.height / 6).endFill();
-      continueBtn.graphics.beginFill('#efefef').drawPolyStar(this.width / 3 * 2, this.height / 2, this.height / 8, 3, 0, 0).endFill();
+      continueBtn.x = this.width / 2;
+      continueBtn.y = this.height / 2;
+      continueBtn.graphics.beginFill('#aaa').drawCircle(0, 0, size / 6).endFill();
+      continueBtn.graphics.beginFill('#efefef').drawPolyStar(0, 0, size / 8, 3, 0, 0).endFill();
 
       continueBtn.on('rollover', function () {
         this.alpha = 0.4;
@@ -329,27 +347,6 @@
       continueBtn.visible = false;
 
       this.addChild(continueBtn);
-
-      var backBtn = this.backBtn = new createjs.Shape();
-      backBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3, this.height / 2, this.height / 6).endFill();
-      backBtn.graphics.beginFill('#efefef').drawCircle(this.width / 3, this.height / 2, this.height / 8).endFill();
-      backBtn.graphics.beginFill('#aaa').drawCircle(this.width / 3, this.height / 2, this.height / 10).endFill();
-      backBtn.graphics.beginFill('#efefef').drawPolyStar(this.width / 3, this.height / 2 - this.height / 9, this.height / 12, 3, 0, 0).endFill();
-
-      backBtn.on('rollover', function () {
-        this.alpha = 0.4;
-      });
-      backBtn.on('rollout', function () {
-        this.alpha = 1;
-      });
-
-      backBtn.on('click', function () {
-        self.dispatchEvent('back');
-      });
-
-      backBtn.visible = false;
-
-      this.addChild(backBtn);
     };
 
     EndTileClass.play = function (tile, callback) {
@@ -359,10 +356,6 @@
         this.continueBtn.alpha = 0;
         createjs.Tween.get(this.continueBtn).to({ alpha: 1 }, 1000, createjs.Ease.getPowInOut(4));
 
-        this.backBtn.visible = true;
-        this.backBtn.alpha = 0;
-        createjs.Tween.get(this.backBtn).to({ alpha: 1 }, 1000, createjs.Ease.getPowInOut(4));
-
         callback(this);
       }, this, true);
     };
@@ -370,30 +363,15 @@
     return createjs.promote(EndTile, "Container");
   }());
 
-  var Tips = (function () {
-    function Tips() {
-      this.Container_constructor();
-
-      this.x = 0;
-      this.y = 0;
-      
-      this.setup();
-    }
-
-    var TipsClass = createjs.extend(Tips, createjs.Container);
-    
-    TipsClass.setup = function () {
-      // draw the screen.
-    };
-
-    return createjs.promote(Tips, "Container");
-  }());
-
   var PuzzleGame = (function () {
     function PuzzleGame(id, state, background) {
       this.stage = new createjs.Stage(id);
       this.stage.enableMouseOver(20);
       this.tiles = [];
+      this.tilesPool = new createjs.Container();
+      this.stage.addChild(this.tilesPool);
+      this.selectingLayer = new createjs.Container();
+      this.stage.addChild(this.selectingLayer);
       this.state = state;
       this.background = background;
     }
@@ -461,7 +439,7 @@
     };
 
     PuzzleGame.prototype.addTile = function (x, y, w, h, name, spriteSheet, terminated) {
-      this.tiles.push(this.stage.addChild(new Tile(x, y, w, h, name, this, spriteSheet, terminated)));
+      this.tiles.push(this.tilesPool.addChild(new Tile(x, y, w, h, name, this, spriteSheet, terminated)));
       return this;
     };
 
@@ -487,9 +465,13 @@
 
     function setup(puzzle, initDef) {
       puzzle.stage.removeAllChildren();
+      puzzle.tilesPool.removeAllChildren();
+      puzzle.selectingLayer.removeAllChildren();
       if (puzzle.background) {
         puzzle.stage.addChild(puzzle.background);
       }
+      puzzle.stage.addChild(puzzle.tilesPool);
+      puzzle.stage.addChild(puzzle.selectingLayer);
       if (initDef.start) {
         puzzle.addStartTile.apply(puzzle, initDef.start);
       }
@@ -505,13 +487,6 @@
       this.initDef = initDef;
 
       setup(this, this.initDef);
-
-      var tips = new Tips(0, 0, this.width, this.height);
-      this.stage.addChild(tips);
-
-      tips.on('click', function () {
-        tips.visible = false;
-      });
     };
 
     PuzzleGameClass.reset = function () {
