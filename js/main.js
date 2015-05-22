@@ -61,7 +61,7 @@
 //          stage: true
 //        }, "stage#" + manager.stageId, null);
         manager.nextStage();
-//        manager.gotoStage(8);
+//        manager.gotoStage(10);
       });
     });
 
@@ -150,6 +150,7 @@
       stage.game.untick();
     });
     
+    // start screen
     stageManager.setup(2, function (stage_element, manager) {
       var stage = new createjs.Stage('start-canvas');
       stage.enableMouseOver(20);
@@ -249,6 +250,12 @@
       stage.addChild(leafBtn, trainBtn, factoryBtn, humanBtn);
       
       stage_element.stage = stage;
+      
+      Array.prototype.forEach.call(document.querySelectorAll('.back.btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          manager.gotoStage(2);
+        });
+      });
     });
 
     // the transition screen and start.
@@ -262,7 +269,7 @@
       createjs.Ticker.off("tick", stage);
     });
 
-    // start screen.
+    // the leaf start screen.
     stageManager.on('goto-3', function (evt) {
       var manager = evt.target;
       var video = document.getElementById('leaf-video');
@@ -394,7 +401,7 @@
 //          stageId: manager.stageId,
 //          stage: true
 //        }, "stage#" + manager.stageId, null);
-        manager.gotoStage(3);
+        manager.gotoStage(2);
       });
       
       game.on('back', function () {
@@ -500,7 +507,7 @@
 //          stageId: manager.stageId,
 //          stage: true
 //        }, "stage#" + manager.stageId, null);
-        manager.gotoStage(3);
+        manager.gotoStage(2);
       });
 
       game.on('back', function () {
@@ -523,6 +530,124 @@
       var stage = evt.stage.stage;
       createjs.Ticker.off("tick", stage);
     });
+    
+    // the human start screen.
+    stageManager.on('goto-9', function (evt) {
+      var manager = evt.target;
+      var video = document.getElementById('human-video');
+      video.play();
+      video.addEventListener('ended', function () {
+        manager.nextStage();
+      });
+    });
+    
+    // the human puzzle.
+    stageManager.on('goto-10', function (evt) {
+      var manager = evt.target;
+      var stage = new createjs.Stage('human-canvas');
+      var bitmap = new createjs.Bitmap('res/human-puzzle/preview.jpg');
+      bitmap.on('click', function () {
+        manager.gotoStage(2);
+      });
+      stage.addChild(bitmap);
+      createjs.Ticker.on("tick", stage);
+    });
+
+//    // the human puzzle.
+//    stageManager.setup(10, function (stage, manager) {
+//      var state = {
+//        '3': {
+//          '2-1': {
+//            animation: '2-2_play',
+//            condition: function (game) {
+//              return false;
+//            }
+//          },
+//          '4': {
+//            animation: '4-2_play',
+//            condition: function (game) {
+//              return false;
+//            }
+//          }
+//        },
+//        '4': {
+//          '5': {
+//            animation: '5_play',
+//            condition: function (game) {
+//              return game.index === 3;
+//            }
+//          }
+//        }
+//      };
+//      var tileSpriteSheet = createSpriteSheetFromSeq({
+//        images: {
+//          '2-1': [1, 99],
+//          '2-2': [1, 99],
+//          '3':   [1, 81],
+////          '4-1': [1, 70],
+//          '4': [1, 102],
+//          '5': [1, 99]
+////          '5-2': [1, 90]
+//        },
+//        frames: {
+//          width: 190,
+//          height: 190
+//        },
+//        prefix: 'res/factory-puzzle/'
+//      });
+//      var specialTileSpriteSheet = createSpriteSheetFromSeq({
+//        images: {
+//          start: [1, 64],
+//          end: [1, 64]
+//        },
+//        frames: {
+//          width: 150,
+//          height: 450
+//        },
+//        prefix: 'res/human-puzzle/'
+//      });
+//
+//      var game = new MazePuzzle('human-canvas', state);
+//
+//      game.init({
+//        start: [50, 90, 150, 450, specialTileSpriteSheet],
+//        tiles: [
+//          [210, 90, 190, 190, '3', tileSpriteSheet],
+//          [410, 90, 190, 190, '2-1', tileSpriteSheet],
+//          [210, 350, 190, 190, '4', tileSpriteSheet],
+//          [410, 350, 190, 190, '5', tileSpriteSheet, true]
+//        ],
+//        end: [610, 90, 150, 450, specialTileSpriteSheet]
+//      });
+//
+//      game.on('gameover', function () {
+////        window.history.pushState({
+////          stageId: manager.stageId,
+////          stage: true
+////        }, "stage#" + manager.stageId, null);
+//        manager.gotoStage(2);
+//      });
+//
+//      game.on('back', function () {
+//        stage.game.reset();
+//      });
+//
+//      game.tick();
+//
+//      stage.game = game;
+//    });
+//
+//    // the human puzzle started.
+//    stageManager.on('goto-10', function (evt) {
+//      var stage = evt.stage.stage;
+//      createjs.Ticker.on("tick", stage);
+//    });
+//
+//    // the human puzzle ended.
+//    stageManager.on('goto-10-done', function (evt) {
+//      var stage = evt.stage.stage;
+//      createjs.Ticker.off("tick", stage);
+//    });
 
 //    window.addEventListener('popstate', function (event) {
 //      if (event.state && event.state.stage) {

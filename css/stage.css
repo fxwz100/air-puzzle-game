@@ -78,7 +78,12 @@
   opacity: 1;
 }
 
-#stage[data-state="9"] .thanks.stage {
+#stage[data-state="9"] .human-start.stage {
+  z-index: 100;
+  opacity: 1;
+}
+
+#stage[data-state="10"] .human-puzzle.stage {
   z-index: 100;
   opacity: 1;
 }
